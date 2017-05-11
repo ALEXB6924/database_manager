@@ -11,11 +11,7 @@ public class Log {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-    @Column
     private String username;
-
-    @Column
     private String databaseUser;
 
     @Column(name = "databaseName")
