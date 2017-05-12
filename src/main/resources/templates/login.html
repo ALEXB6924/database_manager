@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" th:href="@{/stylesheet/jquery-ui.css}"/>
+    <link rel="stylesheet" th:href="@{/stylesheet/jquery-ui.structure.css}"/>
+    <link rel="stylesheet" th:href="@{/stylesheet/login.css}"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript" th:src="@{/script/jquery-ui.js}" ></script>
+    <script type="text/javascript" th:src="@{/script/login.js}" ></script>
+    <title>Log In</title>
+</head>
+<body>
+<div id="content">
+    <div class="winTop">
+        Log In
+    </div>
+    <div class="innerWindow">
+        <div th:fragment="flash" th:if="${flash != null}">
+            <div th:classappend="${#strings.toLowerCase(flash.status)}" th:text="${flash.message}"></div>
+        </div>
+
+        <form th:action="@{/login}" th:object="${user}" method="post" >
+            <p>Enter username and password.</p>
+            <input type="text" id="username" th:field="*{username}" autocomplete="off" /><br/>
+            <input type="password" id="passwd" th:field="*{password}"/><br/><br/>
+            <input type="submit" id="login" class="button" value="Log In" title="Log in to application"/>
+        </form>
+        <div class="logoContainer">
+            <img class="logo" th:src="@{/stylesheet/images/logo.png}"/>
+        </div>
+    </div>
+    <div class="winBottom">
+        Log In
+    </div>
+</div>
+</body>
+</html>
