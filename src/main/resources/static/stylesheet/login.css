@@ -1,0 +1,99 @@
+@CHARSET "UTF-8";
+
+@CHARSET "UTF-8";
+
+#content{
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px #66a3ff solid;
+    border-radius: 25px;
+    background-color: #cce0ff;
+    box-shadow: 8px 8px 8px #888888;
+    width: 700px;
+
+}
+
+form{
+    margin: 5% 15%;
+}
+.winTop{
+    border-bottom: 2px #66a3ff solid;
+    height: 25px;
+    background-color: #66a3ff;
+    background-image: linear-gradient(transparent 50%, rgba(255,255,255,.5) 50%);
+    background-size: 3px 3px;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    background-position: center;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.innerWindow{
+
+}
+
+.winBottom{
+    border-top: 2px #66a3ff solid;
+    height: 25px;
+    background-color: #66a3ff;
+    background-image: linear-gradient(transparent 50%, rgba(255,255,255,.5) 50%);
+    background-size: 3px 3px;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    background-position: center;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+h4{
+    margin: 1px 0px;
+}
+
+#username{
+    height: 20px;
+    width: 30%;
+    font-size: 18px;
+}
+
+#passwd{
+    margin-top: 10px;
+    height: 20px;
+    width: 30%;
+    font-size: 18px;
+}
+
+.button{
+    width: 30%;
+    height: 20%;
+    color: white;
+    font-weight: bold;
+    background-color: #0080ff;
+    border: 3px outset #0080ff;
+    border-radius: 8px;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    text-align: center;
+    padding: 0.5%;
+    max-width: 100px;
+    cursor: pointer;
+    box-shadow: 0 2px 2px 0 #bfbfbf;
+}
+
+.logo{
+    position: absolute;
+    bottom: 50px;
+    right: 20px;
+}
+
+.logoContainer{
+    float: right;
+    position: relative;
+}

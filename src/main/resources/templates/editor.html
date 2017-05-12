@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/stylesheet/cm-dt-jqui.min.css}" media="screen" />
+    <link rel="stylesheet" type="text/css" th:href="@{/stylesheet/editor.css}" media="screen" />
+
+    <script src="http://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+
+    <script type="text/javascript" th:src="@{/scripts/cm-dt-jqui.min.js}"></script>
+    <script type="text/javascript" th:src="@{/scripts/editor.js}"></script>
+
+    <title>DeltiSQLTool</title>
+</head>
+<body>
+<header>
+    <h1>
+        <span style="color:#0080ff; margin-right: 0;">Delti</span>
+        <span style="color: orange; margin-left: -0.4%;">SQL</span>
+    </h1>
+    <h3 class="loggedIn">Welcome <span sec:authentication="name" class="user"></span></h3>
+    <h3 class="loggedIn" th:utext="(${connectedDatabase}!=null and ${connectedDatabase}!='' ? '<br>currently connected to ' + ${connectedDatabase} + '.' : '<br>not connected to any database.')"></h3>
+    <!--<a th:href="@{/logout}" ><img alt="logoudt" th:src="@{/stylesheet/images/logout.png}"></a>-->
+    <p class="success" th:text="${manageUserSuccess}" th:style="(${manageUserSuccess} == '' or ${manageUserSuccess} == null ? 'display:none' : 'display:block')"></p>
+    <p class="error" th:text="${manageUserError}" th:style="(${manageUserError} == '' or ${manageUserError} == null ? 'display:none' : 'display:block')"></p>
+</header>
+<nav>
+    <section class="databaseStructure">
+        <div class="subsection" title="Display's the tables from the connected database.">
+            <div class="subsectionHead">
+                <h4>Tables</h4>
+                <input id="tableSearch" name="tableSearch" type="text" class="textinput" onkeyup="filterList()" placeholder="Search for table.." />
+            </div>
+            <div class="tables">
+                <ul id="databaseTable">
+                    <li><a href="#">Not connected to database.</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="subsection" title="Display's the columns from the selected table.">
+            <div class="subsectionHead">
+                <h4>Table Column</h4>
+            </div>
+            <div class="tableColumns">
+                <ul id="databaseTableColumn">
+                    <li>No table is selected.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <section class="sqlEditor">
+        <div class="textBox">
+            <form>
+                <h4>Insert Query</h4>
+                <textarea id="editor"></textarea>
+                <input id="execute" name="execute" type="button" class="button" value="Execute Query" title="Run the entered query." />
+                <input id="clear" name="clear" type="button" class="button" value="Clear Query" title="Clear the entered text." />
+            </form>
+        </div>
+        <h4>Result</h4>
+        <div class="tableContainer"></div>
+    </section>
+    <section class="information">
+        <div class="subsection databaseConnection">
+            <form th:action="@{/checkConnection}" method="post">
+                <h4>Connect to database</h4>
+                <img class="deltilogo" alt="delticomlogo" th:src="@{/stylesheet/images/logo.png}">
+                <p class="userRequirement">
+                    Insert the required information in order to connect to the data base. If you do not have the necessary credentials to connect to the desired data base, please contact your supervisor.
+                </p>
+                <select id="database" name="database" class="textinput">
+                    <option th:each="database:${databases}" th:text="${database.key}" th:selected="${database.value}"></option>
+                </select>
+                <!-- <input id="database" name="database" type="text" class="textinput" placeholder="Database name" title="The database you wish to connect to." />-->
+                <input id="username" name="username" type="text" class="textinput" placeholder="Username" title="Username for database connection." />
+                <input id="password" name="password" type="password" class="textinput" placeholder="Password" title="Password for the database connection." />
+                <input id="connect" name="connect" type="submit" value="Connect" class="button" title="Click to connect." />
+                <input th:formaction="@{/stopConnection}" id="disconnect" name="disconnect" type="submit" value="Disconnect" class="button" title="Click to disconnect." />
+                <span th:text="(${sqlStatement.rows} == -3 ? ${sqlStatement.message} : '')" class="success"></span>
+                <span th:text="(${sqlStatement.rows} == -4 ? ${sqlStatement.message} : '')" class="error"></span>
+            </form>
+        </div>
+        <div class="subsection">
+            <h4>View Logs</h4>
+            <p class="userRequirement">
+                Select the period from which you want to display the log.
+            </p>
+            <input id="startDate" name="startDate" type="text" class="textinput" placeholder="Start Date" title="Select the start date." />
+            <input id="endDate" name="endDate" type="text" class="textinput" placeholder="End Date" title="Select the end date." />
+            <input id="showLogs" name="showLogs" type="button" value="Display Logs" class="button" title="Click to display log." />
+        </div>
+        <div class="subsection" sec:authorize="hasRole('ROLE_ADMIN')">
+            <h4>User Management</h4>
+            <input id="createUser" name="createUser" type="button" value="Create User" class="button" title="Click to create a user for the application." /><br>
+            <input id="deleteUser" name="deleteUser" type="button" value="Delete User" class="button" title="Click to delete a user for the application." />
+            <input id="viewUsers" name="viewUsers" type="button" value="View Users" class="button" title="Click to display users for the application." />
+        </div>
+        <div class="subsection">
+            <form th:action="@{/logout}" method="post">
+                <p class="userRequirement">
+                    Logout from application.
+                </p>
+                <input id="logout" name="logout" type="submit" value="Logout" class="button" title="Click to logout." />
+            </form>
+        </div>
+    </section>
+</nav>
+<div id="logs" class="dialog">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <span class="close">×</span>
+            <h3 class="headerText">Log</h3>
+        </div>
+        <div class="dialog-body">
+        </div>
+        <div class="dialog-footer">
+            <h3 class="footerText">  </h3>
+        </div>
+    </div>
+</div>
+<div id="createUserDialog" class="dialog">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <span class="close">×</span>
+            <h3 class="headerText">Create User</h3>
+        </div>
+        <div class="dialog-body">
+            <form th:action="@{/saveUser}" method="post" >
+                <p>Enter username and password.</p>
+                <label for="newUsername">Username</label><br/>
+                <input type="text" id="newUsername" name="newUsername"/><br/><br/>
+
+                <label for="passwd">Password</label><br/>
+                <input type="password" id="passwd" name="passwd"/><br/><br/>
+
+                <label for="repasswd">Re-enter Password</label><br/>
+                <input type="password" id="repasswd"/><br/><br/>
+
+                <label for="permission">Permission</label><br/>
+                <input type="text" id="permission" name="permission"/><br/><br/>
+
+                <input type="submit" id="create" class="button" value="Create" title="Create User"/>
+
+                <input id="cancelCreate" type="button" class="button" value="Cancel" title="Close dialog"/>
+            </form>
+        </div>
+        <div class="dialog-footer">
+            <h3 class="footerText">  </h3>
+        </div>
+    </div>
+</div>
+<div id="deleteUserDialog" class="dialog">
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <span class="close">×</span>
+            <h3 class="headerText">Delete User</h3>
+        </div>
+        <div class="dialog-body">
+            <form th:action="@{/deleteUser}" method="post">
+                <label for="userForDeletion">Enter the username:</label><br/>
+                <input type="text" id="userForDeletion" name="userForDeletion" /><br>
+                <input type="submit" id="delete" class="button" value="Delete" title="Delete selected user"/>
+                <input type="button" id="cancelDelete" class="button" value="Cancel" title="Close dialog" />
+            </form>
+        </div>
+        <div class="dialog-footer">
+            <h3 class="footerText">  </h3>
+        </div>
+    </div>
+</div>
+</body>
+</html>

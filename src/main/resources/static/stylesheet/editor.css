@@ -1,0 +1,594 @@
+@CHARSET "UTF-8";
+
+body{
+    /*background-color: #e6e6e6;*/
+    font-family: "Times New Roman", Times, serif;
+}
+
+header{
+    height: 5%;
+    background-color: inherit;
+    color: #0080ff;
+    text-align: center;
+    margin-bottom: 1%;
+}
+
+h1{
+    text-shadow: 2px 2px #bfbfbf;
+}
+
+nav{
+    margin: 1% auto;
+    display: block;
+    width: 100%;
+}
+
+footer{
+    color: #0080ff;
+    bottom: 0;
+    text-align: center;
+    font-family: inherit;
+    font-size: 20px;
+}
+
+section{
+    border: 2px outset #0080ff;
+    box-shadow: 0 7px 7px 0 #bfbfbf;
+    display: inline-table;
+    margin: 0 1%;
+    transition: 0.3s;
+    background-color: #0080ff;
+    position: relative;
+}
+
+section:HOVER {
+    box-shadow: 0 14px 14px 0 #bfbfbf;
+}
+
+.databaseStructure{
+    max-height: 800px;
+    width: 16%;
+}
+
+.sqlEditor{
+    max-height: 830px;
+    max-width: 59%;
+    width: 59%;
+    /*background-color: #e6e6e6;*/
+    background-color: white;
+
+}
+
+.tableContainer{
+    max-height: 500px;
+    max-width: 1100px;
+    display: none;
+    margin-bottom: 1%;
+    /*background-color: #e6e6e6;*/
+    background-color: white;
+    padding: 1%;
+    overflow-x: scroll;
+}
+
+.information{
+    max-height: 800px;
+    width: 16%;
+    background-color: #0080ff;
+}
+
+.subsection{
+    border: 2px inset #0080ff;
+    margin: 2% 2%;
+    max-height: 80%;
+    /*background-color: #e6e6e6;*/
+    background-color: white;
+}
+
+.subsectionHead{
+    border-bottom: 1px solid #0080ff;
+    box-shadow: 0 3px 7px -5px black;
+}
+
+.textinput{
+    margin: 1% 3%;
+    width: 91%;
+    background-color: rgba(230, 230, 230, 0.3);
+    border: 2px inset #0080ff;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.textinput:FOCUS {
+    box-shadow: 0 2px 2px 0 #bfbfbf;
+}
+
+#connect{
+    width: 43%;
+    margin: 1% 3%;
+}
+
+#disconnect{
+    width: 43%;
+    margin-left: 1%;
+    margin-right: 3%;
+}
+
+#connect, #disconnect{
+    display: inline;
+}
+
+.button{
+    width: 30%;
+    height: 20%;
+    color: white;
+    font-weight: bold;
+    background-color: #0080ff;
+    border: 3px outset #0080ff;
+    border-radius: 8px;
+    margin-top: 1%;
+    margin-left: 5%;
+    margin-bottom: 1%;
+    text-align: center;
+    padding: 0.5%;
+    max-width: 150px;
+    cursor: pointer;
+    box-shadow: 0 2px 2px 0 #bfbfbf;
+}
+
+.button:HOVER{
+    box-shadow: 0 2px 2px 0 #bfbfbf;
+}
+
+#execute{
+    color: orange;
+}
+
+#clear{
+    margin-left: 0.5%;
+}
+
+.button:HOVER {
+    color: #0080ff;
+    background-color: #f2f2f2;
+    border-color: #0080ff;
+}
+
+ul{
+    list-style-type: none;
+}
+
+.userRequirement{
+    font-size: 12px;
+    font-family: "Times New Roman", Times, serif;
+    margin: 4%;
+    cursor: default;
+}
+
+h4{
+    font-family: "Times New Roman", Times, serif;
+    margin-bottom: 1%;
+    margin-left: 2%;
+    cursor: default;
+}
+.textBox{
+    max-width: 99%;
+    width: 99%;
+    max-height: 99%;
+    font-weight: bold;
+}
+
+.CodeMirror{
+    max-height: 200px;
+    max-width: 99%;
+    cursor: text;
+    font-size: 15px;
+    font-weight: bolder;
+    border: 2px inset #0080ff;
+    margin: 1% 1%;
+    font-family: "Times New Roman", Times, serif;
+}
+
+.CodeMirror-gutters{
+    max-height: 200px;
+    border: 1px outset #0080ff;
+    background-color: #d9d9d9;
+}
+
+.CodeMirror-gutter{
+    min-height: 200px;
+    border: 1px outset #0080ff;
+    background-color: #d9d9d9;
+}
+
+.CodeMirror-linenumber{
+    color: #0080ff;
+    font-weight: bolder;
+}
+
+#showLogs{
+    width: 93%;
+    margin: 1% 3%;
+}
+
+#createUser, #deleteUser,#viewUsers{
+    width: 93%;
+    margin: 1% 3%;
+}
+
+#logout{
+    width: 93%;
+    margin: 1% 3%;
+}
+
+
+
+
+/*======================================== DIALOG =======================================*/
+.dialog {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 4; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    font-family: "Times New Roman", Times, serif;
+
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* dialog Header */
+.dialog-header {
+    padding: 2px 16px;
+    background-color: rgba(51, 153, 255, 0.9);
+    color: white;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    height: 5%;
+    min-height:25px;
+    border-bottom: 1px outset #0080ff;
+    font-family: "Times New Roman", Times, serif;
+}
+
+/* dialog Body */
+.dialog-body {
+    border: 1px inset #0080ff;
+    padding: 2px 16px;
+    height: 90%;
+    font-family: "Times New Roman", Times, serif;
+}
+
+/* dialog Footer */
+.dialog-footer {
+    padding: 2px 16px;
+    background-color: rgba(51, 153, 255, 0.9);
+    color: white;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    height: 5%;
+    min-height:25px;
+    border-top: 1px outset #0080ff;
+    font-family: "Times New Roman", Times, serif;
+}
+
+.footerText{
+    margin: 1%;
+}
+
+.headerText{
+    margin:1%;
+}
+
+/*.dialog-content {
+    background-color: rgba(0,0,0,0.4);
+    margin: 15% auto; /* 15% from the top and centered
+    padding: 20px;
+    border: 2px outset #0080ff;
+    width: 80%; /* Could be more or less, depending on screen size
+    border-radius: 25px;
+}
+*/
+
+
+/* dialog Content */
+.dialog-content {
+    position: relative;
+    top: 2%;
+    background-color: rgba(230, 230, 230, 0.9);
+    margin: auto;
+    padding: 0;
+    border: 2px outset #0080ff;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    -moz-animation-name: animatetop;
+    -moz-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 26px;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+/*========================================================================================================*/
+
+.selected{
+    background-color: #0080ff;
+    font-weight: bold;
+    color: white;
+}
+
+ul li{
+    cursor: pointer;
+    padding-bottom: 2%;
+}
+
+ul li:HOVER{
+    background-color: #d9d9d9;
+}
+
+ul{
+    padding: 0 10%;
+}
+
+.tables, .tableColumns{
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    overflow-y: scroll;
+    min-height: 300px;
+    max-height: 300px;
+}
+
+.logs{
+    min-height: 300px;
+    padding-top: 15%;
+}
+/*------------------------- LOGS TABLE -------------------------------*/
+#logTable{
+    margin:2%;
+    background-color: rgba(230, 230, 230, 0.9);
+    border: 2px inset #3399ff;
+}
+
+#logTable thead tr th{
+    background-color: #3399ff;
+    border: 1px outset #3399ff;
+    color: white;
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+#logTable tbody tr td{
+    text-align: center;
+    font-weight: bold;
+}
+
+#logTable tbody tr:HOVER {
+    background-color: #d9d9d9;
+}
+/*--------------------------------------------------------------------*/
+
+/*---------------------------- RESULT TABLE ---------------------------*/
+
+#resultTable thead tr th{
+    color: #0080ff;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.dataTables_filter label{
+    color: orange;
+    font-weight: bold;
+}
+
+.dataTables_length label select {
+    color: #0080ff;
+}
+
+.dataTables_length label {
+    color: orange;
+    font-weight: bold;
+}
+
+#resultTable_info{
+    color: orange;
+    font-weight: bold;
+}
+
+#logTable_info{
+    color: orange;
+    font-weight: bold;
+}
+
+#logTable tbody tr:HOVER {
+    background-color: #d9d9d9;
+}
+/*--------------------------------------------------------------------*/
+
+
+.deltilogo{
+    max-width: 270px;
+    max-height: 200px;
+    margin: 0 5%;
+    position: relative;
+}
+
+@MEDIA (max-width: 1900px) {
+
+    .deltilogo{
+        max-width: 240px;
+        max-height: 150px;
+    }
+
+    /*#resultTable{
+        width: 950px;
+        max-width: 950px;
+    }*/
+}
+
+@MEDIA (max-width: 1700px) {
+
+    .deltilogo{
+        max-width: 190px;
+        max-height: 150px;
+    }
+
+    /*#resultTable{
+        width: 780px;
+        max-width: 780px;
+    }*/
+}
+
+@MEDIA (max-width: 1400px) {
+
+    .deltilogo{
+        max-width: 150px;
+        max-height: 110px;
+    }
+
+    /*#resultTable{
+        width: 680px;
+        max-width: 680px;
+    }*/
+}
+
+@MEDIA (max-width: 1200px) {
+
+    .deltilogo{
+        max-width: 110px;
+        max-height: 90px;
+    }
+
+    /*#resultTable{
+        width: 550px;
+        max-width: 550px;
+    }*/
+}
+
+@MEDIA (max-width: 1000px) {
+
+    .deltilogo{
+        max-width: 80px;
+        max-height: 60px;
+    }
+
+    /*#resultTable{
+        width: 430px;
+        max-width: 430px;
+    }*/
+}
+
+@MEDIA (max-width: 740px) {
+
+    .deltilogo{
+        max-width: 70px;
+        max-height: 40px;
+    }
+
+
+    /*#resultTable{
+        width: 400px;
+        max-width: 400px;
+    }*/
+}
+
+@MEDIA (max-width: 700px) {
+
+    .deltilogo{
+        max-width: 40px;
+        max-height: 30px;
+    }
+
+
+    /*#resultTable{
+        width: 300px;
+        max-width: 300px;
+    }*/
+
+    .databaseStructure{
+        display: none;
+    }
+}
+
+
+#databaseTable li a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.error{
+    color: red;
+    margin-left: 5%;
+}
+
+.success{
+    color: green;
+    margin-left: 5%;
+}
+
+/*DIALOG Create USer*/
+#createUserDialog .dialog-content, #deleteUserDialog .dialog-content{
+    width: 30%;
+}
+
+#newUsername,#passwd,#repasswd,#permission,#userForDeletion{
+    height: 20px;
+    width: 100%;
+    font-size: 18px;
+}
+
+#createUserDialog form, #deleteUserDialog form{
+    margin: 5% 20%;
+}
+
+#create, #cancelCreate, #delete, #cancelDelete{
+    width: 40%;
+}
+
+
+.loggedIn{
+    position: absolute;
+    z-index: 3;
+    top:1%;
+    right: 3%;
+}
+
+.logout{
+    position: absolute;
+    z-index: 3;
+}
+
+.user{
+    color: green;
+}

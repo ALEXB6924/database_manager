@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" th:href="@{/stylesheet/jquery-ui.css}"/>
+    <link rel="stylesheet" th:href="@{/stylesheet/jquery-ui.structure.css}"/>
+    <link rel="stylesheet" th:href="@{/stylesheet/userManagement.css}"/>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript" th:src="@{/script/jquery-ui.js}" ></script>
+    <script type="text/javascript" th:src="@{/script/userManagement.js}" ></script>
+    <title>User Management</title>
+</head>
+<body>
+<div id="content">
+    <div class="winTop">
+        User Management
+    </div>
+    <div class="innerWindow">
+        <fieldset>
+            <legend>Create User</legend>
+            <form action="/saveUser" method="post" >
+                <p>Enter username and password.</p>
+                <label for="username">Username</label><br/>
+                <input type="text" id="username" name="username"/><br/><br/>
+
+                <label for="passwd">Password</label><br/>
+                <input type="password" id="passwd" name="password"/><br/><br/>
+
+                <label for="repasswd">Re-enter Password</label><br/>
+                <input type="password" id="repasswd"/><br/><br/>
+
+                <label for="permission">Permission</label><br/>
+                <input type="text" id="permission" name="permission"/><br/><br/>
+
+                <input type="submit" id="create" class="button" value="Create" formaction="/saveUser" title="Create User"/>
+
+                <input id="back" type="submit" class="button" formaction="/backToTransaction" value="Back" title="Go back"/>
+            </form>
+        </fieldset>
+
+        <fieldset>
+            <legend>Delete User</legend>
+            <form id="deleteUser" action="/deleteUser" method="post">
+                <label for="user">Username for deletion</label><br/>
+                <input type="text" id="user" name="user" /><br>
+                <input type="submit" id="delete" class="button" value="Delete" />
+            </form>
+        </fieldset>
+    </div>
+    <div class="winBottom">
+        User Management
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+@CHARSET "UTF-8";
+
+#content{
+	margin: 5% 15%;
+	border: 2px #66a3ff solid;
+	border-radius: 25px;
+	background-color: #cce0ff;
+	box-shadow: 8px 8px 8px #888888;
+	width: 700px;
+}
+
+form{
+	margin: 5% 15%;
+}
+.winTop{
+	border-bottom: 2px #66a3ff solid;
+	height: 25px;
+	background-color: #66a3ff;
+	background-image: linear-gradient(transparent 50%, rgba(255,255,255,.5) 50%);
+	background-size: 3px 3px;
+	border-top-left-radius: 25px;
+	border-top-right-radius: 25px;
+	background-position: center;
+	text-align: center;
+}
+
+.winBottom{
+	border-top: 2px #66a3ff solid;
+	height: 25px;
+	background-color: #66a3ff;
+	background-image: linear-gradient(transparent 50%, rgba(255,255,255,.5) 50%);
+	background-size: 3px 3px;
+	border-bottom-left-radius: 25px;
+	border-bottom-right-radius: 25px;
+	background-position: center;
+	text-align: center;
+}
+
+
+#username,#passwd,#repasswd,#permission, #user{
+	height: 20px;
+	width: 60%;
+	font-size: 18px;
+}
+
+.button{
+	text-decoration: none;
+	height: 20%;
+	width: 30%;
+	margin: 1% 1%;
+	color: white;
+	font-weight: bold;
+	background-color: #0080ff;
+	border: 3px outset #0080ff;
+	border-radius: 4px;
+	text-align: center;
+	padding: 0.5%;
+	max-width: 150px;
+	cursor: pointer;
+	box-shadow: 0 2px 2px 0 #bfbfbf;
+}
+
+.button:HOVER{
+	box-shadow: 0 2px 2px 0 #bfbfbf;
+}
+
+fieldset{
+	margin: 5%;
+	border: 1px #66a3ff solid;
+	box-shadow: 4px 4px 4px 2px #1a75ff;
+}
+
+legend{
+	color:#1a75ff;
+	font-weight: bold;
+}

@@ -43,9 +43,9 @@ public class DataConfiguration {
 
         BasicDataSource basicDataSource = new BasicDataSource();
         basicDataSource.setDriverClassName(environment.getProperty("database_manager.db.driver"));
-        basicDataSource.setUrl(environment.getProperty("database_manager.db.url_live"));
-        basicDataSource.setUsername(environment.getProperty("database_manager.db.username_live"));
-        basicDataSource.setPassword(environment.getProperty("database_manager.db.password_live"));
+        basicDataSource.setUrl(environment.getProperty("database_manager.db.url"));
+        basicDataSource.setUsername(environment.getProperty("database_manager.db.username"));
+        basicDataSource.setPassword(environment.getProperty("database_manager.db.password"));
 
         return basicDataSource;
     }

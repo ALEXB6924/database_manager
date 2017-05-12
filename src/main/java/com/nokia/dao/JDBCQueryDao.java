@@ -1,6 +1,7 @@
 package com.nokia.dao;
 
 import com.nokia.model.JDBCQuery;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 
