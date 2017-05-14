@@ -23,6 +23,7 @@ public class JDBCQueryImpl implements JDBCQueryDao {
         int rows = 0;
         String message = null;
         Class.forName("com.mysql.jdbc.Driver");
+        System.out.println(query);
 
         try {
             connection = DriverManager.getConnection(

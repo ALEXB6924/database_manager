@@ -1,6 +1,7 @@
 package com.nokia.controller;
 
 import com.nokia.controller.helper.ManagerUtil;
+import com.nokia.model.Log;
 import com.nokia.service.provider.FrontendDataProvider;
 import com.nokia.model.JDBCQuery;
 import com.nokia.model.User;
@@ -25,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,44 +69,35 @@ public class DatabaseManagementController {
     @RequestMapping(value = "/executeStatement", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
-    public String executeStatement(@RequestParam String statement, Principal principal)
-            throws SQLException, ClassNotFoundException {
-
-        long start = System.currentTimeMillis();
+    public String executeStatement(@RequestParam String statement, Principal principal) throws SQLException, ClassNotFoundException {
 
         User user = (User) ((UsernamePasswordAuthenticationToken)principal).getPrincipal();
 
         frontendDataProvider.setQuery(statement);
 
-        List<String> columnHeader;
-        List<List<String>> columnHeaders = new ArrayList<>();
-        Map<String, List<List<String>>> json = new HashMap<>();
-
         JDBCQuery jdbcQuery = jdbcQueryService.run(statement, frontendDataProvider.getDbusername(), frontendDataProvider.getDbpassword(),
                 frontendDataProvider.getConnectedDatabase(), frontendDataProvider.getHostname());
+        if (frontendDataProvider.getConnectedDatabase() == null || frontendDataProvider.getConnectedDatabase().isEmpty()){
+            jdbcQuery.setMessage("Could not establish connection!");
+        }
 
-        managerUtil.getJSONQueryResults(statement, user, columnHeaders, json, jdbcQuery);
 
-        long end = System.currentTimeMillis();
-        System.out.println("Executed in" + (end - start) / 1000 + "seconds!");
-
-        return JSONValue.toJSONString(json);
+        return JSONValue.toJSONString(managerUtil.getJSONQueryResults(statement, user, jdbcQuery));
     }
 
     @RequestMapping(value = "/checkConnection")
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_USER')")
-    public String checkConnection(@RequestParam String username, @RequestParam String password,
-                                  @RequestParam String database, RedirectAttributes redirectAttributes)
-            throws SQLException, ClassNotFoundException {
+    public String checkConnection(@RequestParam String username, @RequestParam String password, @RequestParam String database,
+                                  RedirectAttributes redirectAttributes) throws SQLException, ClassNotFoundException {
 
         JDBCQuery jdbcQuery;
-        if(!database.equals("junit") || !database.equals("junit_do")) {
+//        if(!database.equals("junit")) {
             frontendDataProvider.setHostname(databaseURLService.getDatabaseUrl(database));
-        }
+//        }
 
-        else {
-            frontendDataProvider.setHostname(httpServletRequest.getRemoteAddr() + ":3306");
-        }
+//        else {
+//            frontendDataProvider.setHostname(httpServletRequest.getRemoteAddr() + ":3306");
+//        }
         jdbcQuery = jdbcQueryService.getConnection(username, password, database, frontendDataProvider.getHostname());
         if (jdbcQuery.getMessage().equals("Connection successful!")) {
             frontendDataProvider.setDbusername(username);
@@ -135,6 +127,10 @@ public class DatabaseManagementController {
         if (frontendDataProvider.getConnectedDatabase() != null && !frontendDataProvider.getConnectedDatabase().equals("")) {
             jdbcQuery.setRows(-3);
             jdbcQuery.setMessage("Disconnected!");
+            frontendDataProvider.setConnectedDatabase("");
+            frontendDataProvider.setDbusername("");
+            frontendDataProvider.setDbpassword("");
+            frontendDataProvider.setHostname("");
         }
 
         else {
@@ -148,4 +144,40 @@ public class DatabaseManagementController {
 
         return "redirect:/sqlTransaction";
     }
+
+    @RequestMapping(value = "/databaseStructureTables.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String getDatabaseTables()
+            throws SQLException, ClassNotFoundException {
+
+        Map<String, Object> columnMap = new HashMap<>();
+        Map<String, List<Map<String, Object>>> json = new HashMap<>();
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        if (frontendDataProvider.getConnectedDatabase() != null && !frontendDataProvider.getConnectedDatabase().isEmpty()) {
+
+            return JSONValue.toJSONString(managerUtil.getDatabaseTables(json, list, columnMap));
+
+        } else {
+
+            columnMap = new HashMap<>();
+            columnMap.put("table", "Not connected to database!");
+            list.add(columnMap);
+            json.put("databaseStructure", list);
+
+        }
+
+        return JSONValue.toJSONString(json);
+
+    }
+
+
+    @RequestMapping(value = "/databaseStructureTableColumns.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String getDatabaseTableColumns(@RequestParam String table)
+            throws ClassNotFoundException, SQLException {
+
+        return JSONValue.toJSONString(managerUtil.getTableColumns(table));
+    }
+
 }

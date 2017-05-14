@@ -51,6 +51,12 @@ public class AuthenticationController {
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(ModelMap modelMap) throws NoSuchAlgorithmException {
 
+        frontendDataProvider.setHostname("");
+        frontendDataProvider.setDbpassword("");
+        frontendDataProvider.setDbusername("");
+        frontendDataProvider.setConnectedDatabase("");
+        frontendDataProvider.setQuery("");
+
         Object flash = httpServletRequest.getSession().getAttribute("flash");
 
         if(flash != null)

@@ -29,6 +29,11 @@
     <p class="error" th:text="${manageUserError}" th:style="(${manageUserError} == '' or ${manageUserError} == null ? 'display:none' : 'display:block')"></p>
 </header>
 <nav>
+    <form th:action="@{/uploadCSV}" method="post" enctype="multipart/form-data" id="uploadForm">
+        <input type="file" id="file" name="multipartFile" class="button">
+        <input type="text" id="table_name" name="tableName" class="button">
+        <input type="submit" value="Upload" class="button">
+    </form>
     <section class="databaseStructure">
         <div class="subsection" title="Display's the tables from the connected database.">
             <div class="subsectionHead">
