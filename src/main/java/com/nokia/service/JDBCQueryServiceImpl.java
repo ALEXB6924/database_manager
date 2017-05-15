@@ -25,4 +25,9 @@ public class JDBCQueryServiceImpl implements JDBCQueryService {
     public JDBCQuery getConnection(String username, String password, String database, String hostname) throws ClassNotFoundException, SQLException {
         return jdbcQueryDao.getConnection(username, password, database, hostname);
     }
+
+    @Override
+    public JDBCQuery runCustomScript(String query, String username, String password, String database, String hostname) throws SQLException, ClassNotFoundException {
+        return jdbcQueryDao.runCustomScript(query, username, password, database, hostname);
+    }
 }

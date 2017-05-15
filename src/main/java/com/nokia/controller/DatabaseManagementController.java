@@ -1,8 +1,8 @@
 package com.nokia.controller;
 
 import com.nokia.controller.helper.ManagerUtil;
-import com.nokia.model.Log;
-import com.nokia.service.provider.FrontendDataProvider;
+import com.nokia.controller.helper.beans.CSVDataHolder;
+import com.nokia.controller.helper.beans.FrontendDataHolder;
 import com.nokia.model.JDBCQuery;
 import com.nokia.model.User;
 import com.nokia.service.DatabaseURLService;
@@ -16,15 +16,20 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.*;
+import java.net.URLConnection;
 import java.security.Principal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -40,31 +45,15 @@ import java.util.Map;
 public class DatabaseManagementController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private JDBCQueryService jdbcQueryService;
-
-    @Autowired
-    private LogService logService;
-
     @Autowired
     private DatabaseURLService databaseURLService;
-
     @Autowired
-    private HttpServletRequest httpServletRequest;
-
-    @Autowired
-    private HttpServletResponse httpServletResponse;
-
-    @Autowired
-    private HttpSession httpSession;
-
-    @Autowired
-    private FrontendDataProvider frontendDataProvider;
-
+    private FrontendDataHolder frontendDataHolder;
     @Autowired
     private ManagerUtil managerUtil;
+    @Autowired
+    private CSVDataHolder csvDataHolder;
 
     @RequestMapping(value = "/executeStatement", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -73,11 +62,11 @@ public class DatabaseManagementController {
 
         User user = (User) ((UsernamePasswordAuthenticationToken)principal).getPrincipal();
 
-        frontendDataProvider.setQuery(statement);
+        frontendDataHolder.setQuery(statement);
 
-        JDBCQuery jdbcQuery = jdbcQueryService.run(statement, frontendDataProvider.getDbusername(), frontendDataProvider.getDbpassword(),
-                frontendDataProvider.getConnectedDatabase(), frontendDataProvider.getHostname());
-        if (frontendDataProvider.getConnectedDatabase() == null || frontendDataProvider.getConnectedDatabase().isEmpty()){
+        JDBCQuery jdbcQuery = jdbcQueryService.run(statement, frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword(),
+                frontendDataHolder.getConnectedDatabase(), frontendDataHolder.getHostname());
+        if (frontendDataHolder.getConnectedDatabase() == null || frontendDataHolder.getConnectedDatabase().isEmpty()){
             jdbcQuery.setMessage("Could not establish connection!");
         }
 
@@ -92,24 +81,24 @@ public class DatabaseManagementController {
 
         JDBCQuery jdbcQuery;
 //        if(!database.equals("junit")) {
-            frontendDataProvider.setHostname(databaseURLService.getDatabaseUrl(database));
+            frontendDataHolder.setHostname(databaseURLService.getDatabaseUrl(database));
 //        }
 
 //        else {
-//            frontendDataProvider.setHostname(httpServletRequest.getRemoteAddr() + ":3306");
+//            frontendDataHolder.setHostname(httpServletRequest.getRemoteAddr() + ":3306");
 //        }
-        jdbcQuery = jdbcQueryService.getConnection(username, password, database, frontendDataProvider.getHostname());
+        jdbcQuery = jdbcQueryService.getConnection(username, password, database, frontendDataHolder.getHostname());
         if (jdbcQuery.getMessage().equals("Connection successful!")) {
-            frontendDataProvider.setDbusername(username);
-            frontendDataProvider.setDbpassword(password);
-            frontendDataProvider.setConnectedDatabase(database);
-            frontendDataProvider.setDbusername(password);
+            frontendDataHolder.setDbusername(username);
+            frontendDataHolder.setDbpassword(password);
+            frontendDataHolder.setConnectedDatabase(database);
+            frontendDataHolder.setDbusername(password);
         }
         // }
-        frontendDataProvider.markSelectedDatabse();
+        frontendDataHolder.markSelectedDatabse();
 
-        redirectAttributes.addFlashAttribute("statement", frontendDataProvider.getQuery());
-        redirectAttributes.addFlashAttribute("databases", frontendDataProvider.getAvailableDatabases());
+        redirectAttributes.addFlashAttribute("statement", frontendDataHolder.getQuery());
+        redirectAttributes.addFlashAttribute("databases", frontendDataHolder.getAvailableDatabases());
         redirectAttributes.addFlashAttribute("sqlStatement", jdbcQuery);
 
         System.out.println(jdbcQuery.getMessage());
@@ -124,13 +113,13 @@ public class DatabaseManagementController {
     public String stopConnection(ModelMap modelMap, RedirectAttributes redirectAttributes) {
 
         JDBCQuery jdbcQuery = new JDBCQuery();
-        if (frontendDataProvider.getConnectedDatabase() != null && !frontendDataProvider.getConnectedDatabase().equals("")) {
+        if (frontendDataHolder.getConnectedDatabase() != null && !frontendDataHolder.getConnectedDatabase().equals("")) {
             jdbcQuery.setRows(-3);
             jdbcQuery.setMessage("Disconnected!");
-            frontendDataProvider.setConnectedDatabase("");
-            frontendDataProvider.setDbusername("");
-            frontendDataProvider.setDbpassword("");
-            frontendDataProvider.setHostname("");
+            frontendDataHolder.setConnectedDatabase("");
+            frontendDataHolder.setDbusername("");
+            frontendDataHolder.setDbpassword("");
+            frontendDataHolder.setHostname("");
         }
 
         else {
@@ -138,8 +127,8 @@ public class DatabaseManagementController {
             jdbcQuery.setMessage("No connection!");
         }
 
-        redirectAttributes.addFlashAttribute("statement", frontendDataProvider.getQuery());
-        redirectAttributes.addFlashAttribute("databases", frontendDataProvider.getAvailableDatabases());
+        redirectAttributes.addFlashAttribute("statement", frontendDataHolder.getQuery());
+        redirectAttributes.addFlashAttribute("databases", frontendDataHolder.getAvailableDatabases());
         redirectAttributes.addFlashAttribute("sqlStatement", jdbcQuery);
 
         return "redirect:/sqlTransaction";
@@ -154,7 +143,7 @@ public class DatabaseManagementController {
         Map<String, List<Map<String, Object>>> json = new HashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
 
-        if (frontendDataProvider.getConnectedDatabase() != null && !frontendDataProvider.getConnectedDatabase().isEmpty()) {
+        if (frontendDataHolder.getConnectedDatabase() != null && !frontendDataHolder.getConnectedDatabase().isEmpty()) {
 
             return JSONValue.toJSONString(managerUtil.getDatabaseTables(json, list, columnMap));
 
@@ -180,4 +169,53 @@ public class DatabaseManagementController {
         return JSONValue.toJSONString(managerUtil.getTableColumns(table));
     }
 
+    @RequestMapping(value = "/customScript", method = RequestMethod.POST)
+    public String customScript(@RequestParam MultipartFile multipartFile, Principal principal, RedirectAttributes redirectAttributes)
+            throws SQLException, ClassNotFoundException, IOException {
+
+        InputStream inputStream = multipartFile.getInputStream();
+        BufferedReader sqlScript = new BufferedReader(new InputStreamReader(inputStream));
+        List<String[]> lines = new ArrayList<>();
+        String line;
+        String script = "";
+        while ((line = sqlScript.readLine()) != null){
+//            csvLines.add(line.replaceAll("[^A-Za-z0-9, ]", "").split(","));
+//            lines.add(line.split("\n"));
+            script = script + line + "\n";
+        }
+
+        JDBCQuery jdbcQuery = jdbcQueryService.runCustomScript(script, frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword(),
+                frontendDataHolder.getConnectedDatabase(), frontendDataHolder.getHostname());
+        if (frontendDataHolder.getConnectedDatabase() == null || frontendDataHolder.getConnectedDatabase().isEmpty()){
+            jdbcQuery.setMessage("Could not establish connection!");
+        }
+
+        return "redirect:/sqlTransaction";
+    }
+
+    @RequestMapping(value = "/dumpDatabase",  method = RequestMethod.POST)
+    public String dumpDatabase(HttpServletResponse httpServletResponse) throws IOException, InterruptedException {
+        String executeCmd = "mysqldump -u" + frontendDataHolder.getDbusername() + " -p" + frontendDataHolder.getDbpassword() +
+                " --database " + frontendDataHolder.getConnectedDatabase() + " -r " + "/home/alexandru_bobernac/Documents/dump.txt";
+        Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+        int processComplete = runtimeProcess.waitFor();
+        if (processComplete == 0) {
+
+            File fileToDownload = new File("/home/alexandru_bobernac/Documents/dump.txt");
+
+            String mimeType = URLConnection.guessContentTypeFromName(fileToDownload.getName());
+            if (mimeType == null) {
+                mimeType = "application/octet-stream";
+            }
+
+            httpServletResponse.setContentType(mimeType);
+            httpServletResponse.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", "dump.txt"));
+            httpServletResponse.setContentLength((int) fileToDownload.length());
+
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(fileToDownload));
+            FileCopyUtils.copy(inputStream, httpServletResponse.getOutputStream());
+        }
+
+        return "redirect:/sqlTransaction";
+    }
 }

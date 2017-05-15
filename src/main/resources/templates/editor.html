@@ -24,14 +24,13 @@
     </h1>
     <h3 class="loggedIn">Welcome <span sec:authentication="name" class="user"></span></h3>
     <h3 class="loggedIn" th:utext="(${connectedDatabase}!=null and ${connectedDatabase}!='' ? '<br>currently connected to ' + ${connectedDatabase} + '.' : '<br>not connected to any database.')"></h3>
-    <!--<a th:href="@{/logout}" ><img alt="logoudt" th:src="@{/stylesheet/images/logout.png}"></a>-->
     <p class="success" th:text="${manageUserSuccess}" th:style="(${manageUserSuccess} == '' or ${manageUserSuccess} == null ? 'display:none' : 'display:block')"></p>
     <p class="error" th:text="${manageUserError}" th:style="(${manageUserError} == '' or ${manageUserError} == null ? 'display:none' : 'display:block')"></p>
 </header>
 <nav>
     <form th:action="@{/uploadCSV}" method="post" enctype="multipart/form-data" id="uploadForm">
-        <input type="file" id="file" name="multipartFile" class="button">
-        <input type="text" id="table_name" name="tableName" class="button">
+        <input type="file" id="file" name="multipartFile">
+        <input type="text" id="table_name" name="tableName">
         <input type="submit" value="Upload" class="button">
     </form>
     <section class="databaseStructure">
@@ -64,6 +63,7 @@
                 <textarea id="editor"></textarea>
                 <input id="execute" name="execute" type="button" class="button" value="Execute Query" title="Run the entered query." />
                 <input id="clear" name="clear" type="button" class="button" value="Clear Query" title="Clear the entered text." />
+                <input type="button" id="exportToCSV" class="button" onclick="window.location='/exportCSV';" value="export to csv">
             </form>
         </div>
         <h4>Result</h4>
@@ -87,6 +87,9 @@
                 <input th:formaction="@{/stopConnection}" id="disconnect" name="disconnect" type="submit" value="Disconnect" class="button" title="Click to disconnect." />
                 <span th:text="(${sqlStatement.rows} == -3 ? ${sqlStatement.message} : '')" class="success"></span>
                 <span th:text="(${sqlStatement.rows} == -4 ? ${sqlStatement.message} : '')" class="error"></span>
+            </form>
+            <form th:action="@{/dumpDatabase}" method="post">
+                <input type="submit" class="button" id="dumpDatabase" value="Dump Database"/>
             </form>
         </div>
         <div class="subsection">
@@ -113,6 +116,10 @@
             </form>
         </div>
     </section>
+    <form th:action="@{/customScript}" method="post" enctype="multipart/form-data" id="runScript">
+        <input type="file" id="scriptFile" name="multipartFile">
+        <input type="submit" value="Upload" class="button">
+    </form>
 </nav>
 <div id="logs" class="dialog">
     <div class="dialog-content">

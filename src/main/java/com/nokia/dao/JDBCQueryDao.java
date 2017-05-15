@@ -13,4 +13,6 @@ public interface JDBCQueryDao {
             throws ClassNotFoundException, SQLException;
     JDBCQuery getConnection(String username, String password, String database, String hostname)
             throws ClassNotFoundException, SQLException;
+    JDBCQuery runCustomScript(String query, String username, String password, String database, String hostname)
+            throws SQLException, ClassNotFoundException;
 }

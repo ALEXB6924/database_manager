@@ -1,6 +1,8 @@
 package com.nokia.dao;
 
+import com.nokia.controller.helper.beans.CSVDataHolder;
 import com.nokia.model.JDBCQuery;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -13,6 +15,9 @@ import java.util.List;
 @Repository
 public class JDBCQueryImpl implements JDBCQueryDao {
 
+    @Autowired
+    private CSVDataHolder csvDataHolder;
+
     @Override
     public JDBCQuery run(String query, String username, String password, String database, String hostname)
             throws ClassNotFoundException, SQLException {
@@ -20,7 +25,9 @@ public class JDBCQueryImpl implements JDBCQueryDao {
         Connection connection = null;
         List<String> columns = new ArrayList<>();
         List<List<String>> values = new ArrayList<>();
+        JDBCQuery jdbcQuery = new JDBCQuery();
         int rows = 0;
+        String[] queries;
         String message = null;
         Class.forName("com.mysql.jdbc.Driver");
         System.out.println(query);
@@ -32,8 +39,7 @@ public class JDBCQueryImpl implements JDBCQueryDao {
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
 
-            if (query.toLowerCase().startsWith("select") || query.toLowerCase().startsWith("explain")
-                    || query.toLowerCase().startsWith("show")) {
+            if (checkIfMethodReturnsRows(query)) {
                 ResultSet rs = statement.executeQuery(query);
                 ResultSetMetaData column = rs.getMetaData();
 
@@ -51,8 +57,16 @@ public class JDBCQueryImpl implements JDBCQueryDao {
                 rs.close();
                 rows = -2;
             } else {
-                rows = statement.executeUpdate(query);
-                statement.close();
+                queries = query.split("\n");
+                if (queries.length > 1){
+                    for (String string : queries){
+                        rows = statement.executeUpdate(string);
+                    }
+                }
+                else {
+                    rows = statement.executeUpdate(query);
+                    statement.close();
+                }
             }
         } catch (SQLException e) {
             message = e.getMessage();
@@ -66,7 +80,17 @@ public class JDBCQueryImpl implements JDBCQueryDao {
             }
         }
 
+        if (!columns.isEmpty()){
+            csvDataHolder.setColumns(columns);
+            csvDataHolder.setValues(values);
+        }
+
         return new JDBCQuery(rows, message, columns, values);
+    }
+
+    private boolean checkIfMethodReturnsRows(String query) {
+        return query.toLowerCase().startsWith("select") || query.toLowerCase().startsWith("explain")
+                || query.toLowerCase().startsWith("show") || query.toLowerCase().startsWith("describe");
     }
 
     @Override
@@ -99,4 +123,49 @@ public class JDBCQueryImpl implements JDBCQueryDao {
 
         return new JDBCQuery(rows, message, columns, values);
     }
+
+    @Override
+    public JDBCQuery runCustomScript(String query, String username, String password, String database, String hostname) throws SQLException, ClassNotFoundException {
+
+        Connection connection = null;
+        List<String> columns = new ArrayList<>();
+        List<List<String>> values = new ArrayList<>();
+        String[] queries;
+        int rows = 0;
+        int allRows[];
+        String message = null;
+        Class.forName("com.mysql.jdbc.Driver");
+        System.out.println(query);
+
+        try {
+            connection = DriverManager.getConnection(
+                    "jdbc:mysql://" + hostname + "/" + database + "?zeroDateTimeBehavior=convertToNull", username,
+                    password);
+            connection.setAutoCommit(false);
+            Statement statement = connection.createStatement();
+
+            queries = query.split("\n");
+
+            for (String string : queries) {
+                statement.addBatch(string);
+            }
+            allRows = statement.executeBatch();
+            statement.close();
+            for (int i : allRows) {
+                rows = rows + i;
+            }
+
+        } catch (SQLException e) {
+            message = e.getMessage();
+            rows = -1;
+        } finally {
+            if (connection != null) {
+                connection.commit();
+                connection.close();
+            }
+        }
+
+        return new JDBCQuery(rows, message, columns, values);
+    }
+
 }

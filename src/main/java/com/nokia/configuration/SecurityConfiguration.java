@@ -50,27 +50,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
         web.ignoring().antMatchers("/scripts/**");
     }
 
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .anyRequest().hasAnyRole("ADMIN", "USER")
+                    .anyRequest().hasAnyRole("ADMIN", "USER")
                 .and()
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()
-                .successHandler(loginSuccessHandler())
-                .failureHandler(loginFailureHandler())
+                    .formLogin()
+                    .loginPage("/login")
+                    .permitAll()
+                    .successHandler(loginSuccessHandler())
+                    .failureHandler(loginFailureHandler())
                 .and()
                 .logout()
-                .permitAll()
+                    .permitAll()
                 .logoutSuccessHandler(logoutSuccessHandler())
-                .deleteCookies()
-                .and()
-                .csrf()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
+                .deleteCookies();
     }
 
 

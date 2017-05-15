@@ -1,4 +1,4 @@
-package com.nokia.service.provider;
+package com.nokia.controller.helper.beans;
 
 import com.nokia.model.DatabaseURL;
 import com.nokia.service.DatabaseURLService;
@@ -13,7 +13,7 @@ import java.util.Map;
  * Created by alexandru_bobernac on 5/12/17.
  */
 @Component
-public class FrontendDataProvider {
+public class FrontendDataHolder {
 
     @Autowired
     private DatabaseURLService databaseURLService;
@@ -25,7 +25,7 @@ public class FrontendDataProvider {
     String dbusername;
     String dbpassword;
 
-    public FrontendDataProvider() {
+    public FrontendDataHolder() {
     }
 
     public String getQuery() {

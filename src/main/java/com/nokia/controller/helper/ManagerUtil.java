@@ -2,18 +2,12 @@ package com.nokia.controller.helper;
 
 import com.nokia.model.JDBCQuery;
 import com.nokia.model.User;
-import com.nokia.service.DatabaseURLService;
-import com.nokia.service.JDBCQueryService;
 import com.nokia.service.LogService;
-import com.nokia.service.UserService;
-import com.nokia.service.provider.FrontendDataProvider;
+import com.nokia.controller.helper.beans.FrontendDataHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +24,7 @@ public class ManagerUtil {
     private LogService logService;
 
     @Autowired
-    private FrontendDataProvider frontendDataProvider;
+    private FrontendDataHolder frontendDataHolder;
 
     public Map<String, List<List<String>>> getJSONQueryResults(@RequestParam String statement, User user, JDBCQuery jdbcQuery) {
         List<String> columnHeader;
@@ -39,7 +33,7 @@ public class ManagerUtil {
 
         if (jdbcQuery.getRows() > 0) {
             String date = logService.getDate();
-            logService.saveLog(user.getUsername(), frontendDataProvider.getDbusername(), frontendDataProvider.getConnectedDatabase(), statement, date);
+            logService.saveLog(user.getUsername(), frontendDataHolder.getDbusername(), frontendDataHolder.getConnectedDatabase(), statement, date);
 
             System.out.println(jdbcQuery.getMessage());
 
@@ -75,11 +69,11 @@ public class ManagerUtil {
 
         Class.forName("com.mysql.jdbc.Driver");
         Connection con = DriverManager.getConnection(
-                "jdbc:mysql://" + frontendDataProvider.getHostname() + "/" + frontendDataProvider.getConnectedDatabase() +
-                        "?zeroDateTimeBehavior=convertToNull", frontendDataProvider.getDbusername(), frontendDataProvider.getDbpassword());
+                "jdbc:mysql://" + frontendDataHolder.getHostname() + "/" + frontendDataHolder.getConnectedDatabase() +
+                        "?zeroDateTimeBehavior=convertToNull", frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword());
 
         PreparedStatement ps = con.prepareStatement("SELECT table_name FROM information_schema.tables WHERE TABLE_SCHEMA=?");
-        ps.setString(1, frontendDataProvider.getConnectedDatabase());
+        ps.setString(1, frontendDataHolder.getConnectedDatabase());
         ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {
@@ -104,17 +98,18 @@ public class ManagerUtil {
         List<Map<String, Object>> list = new ArrayList<>();
 
         Class.forName("com.mysql.jdbc.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:mysql://" + frontendDataProvider.getHostname() + "/" + frontendDataProvider.getConnectedDatabase(),
-                frontendDataProvider.getDbusername(), frontendDataProvider.getDbpassword());
+        Connection connection = DriverManager.getConnection("jdbc:mysql://" + frontendDataHolder.getHostname() + "/" + frontendDataHolder.getConnectedDatabase(),
+                frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword());
         PreparedStatement ps = connection.prepareStatement(
-                "SELECT COLUMN_NAME FROM information_schema.columns WHERE TABLE_SCHEMA=? AND table_name = ?");
-        ps.setString(1, frontendDataProvider.getConnectedDatabase());
+                "SELECT COLUMN_NAME, COLUMN_TYPE FROM information_schema.columns WHERE TABLE_SCHEMA=? AND table_name = ?");
+        ps.setString(1, frontendDataHolder.getConnectedDatabase());
         ps.setString(2, table);
         ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {
             columnMap = new HashMap<>();
             columnMap.put("column", rs.getString(1));
+            columnMap.put("column_type", rs.getString(2));
             list.add(columnMap);
 
         }

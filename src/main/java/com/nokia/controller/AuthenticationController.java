@@ -1,6 +1,6 @@
 package com.nokia.controller;
 
-import com.nokia.service.provider.FrontendDataProvider;
+import com.nokia.controller.helper.beans.FrontendDataHolder;
 import com.nokia.model.JDBCQuery;
 import com.nokia.model.User;
 import com.nokia.service.DatabaseURLService;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -46,16 +47,16 @@ public class AuthenticationController {
     private HttpSession httpSession;
 
     @Autowired
-    private FrontendDataProvider frontendDataProvider;
+    private FrontendDataHolder frontendDataHolder;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login(ModelMap modelMap) throws NoSuchAlgorithmException {
 
-        frontendDataProvider.setHostname("");
-        frontendDataProvider.setDbpassword("");
-        frontendDataProvider.setDbusername("");
-        frontendDataProvider.setConnectedDatabase("");
-        frontendDataProvider.setQuery("");
+        frontendDataHolder.setHostname("");
+        frontendDataHolder.setDbpassword("");
+        frontendDataHolder.setDbusername("");
+        frontendDataHolder.setConnectedDatabase("");
+        frontendDataHolder.setQuery("");
 
         Object flash = httpServletRequest.getSession().getAttribute("flash");
 
@@ -82,15 +83,15 @@ public class AuthenticationController {
     @RequestMapping(value = "/sqlTransaction")
     public String sqlTransaction(ModelMap modelMap) {
 
-        frontendDataProvider.setQuery("");
-        frontendDataProvider.setAvailableDatabases();
+        frontendDataHolder.setQuery("");
+        frontendDataHolder.setAvailableDatabases();
 
         if(!modelMap.containsAttribute("sqlStatement")) {
-            modelMap.put("statement", frontendDataProvider.getQuery());
-            modelMap.put("databases", frontendDataProvider.getAvailableDatabases());
+            modelMap.put("statement", frontendDataHolder.getQuery());
+            modelMap.put("databases", frontendDataHolder.getAvailableDatabases());
             modelMap.put("sqlStatement", new JDBCQuery());
         }
-        modelMap.put("connectedDatabase", frontendDataProvider.getConnectedDatabase());
+        modelMap.put("connectedDatabase", frontendDataHolder.getConnectedDatabase());
 
         return "editor";
     }
