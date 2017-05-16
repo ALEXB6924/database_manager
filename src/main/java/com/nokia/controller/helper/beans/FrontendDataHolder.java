@@ -19,13 +19,13 @@ public class FrontendDataHolder {
     @Autowired
     private DatabaseURLService databaseURLService;
 
-    String query;
-    Map<String, Boolean> availableDatabases = new HashMap<>();
-    String connectedDatabase;
-    String hostname;
-    String dbusername;
-    String dbpassword;
-    JDBCQuery jdbcQuery;
+    private String query;
+    private Map<String, Boolean> availableDatabases = new HashMap<>();
+    private String connectedDatabase;
+    private String hostname;
+    private String dbusername;
+    private String dbpassword;
+    private JDBCQuery jdbcQuery;
 
     public JDBCQuery getJdbcQuery() {
         return jdbcQuery;

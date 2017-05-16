@@ -14,13 +14,13 @@
     <script type="text/javascript" th:src="@{/scripts/cm-dt-jqui.min.js}"></script>
     <script type="text/javascript" th:src="@{/scripts/editor.js}"></script>
 
-    <title>DeltiSQLTool</title>
+    <title>DatabaseManager</title>
 </head>
 <body>
 <header>
     <h1>
-        <span style="color:#0080ff; margin-right: 0;">Delti</span>
-        <span style="color: orange; margin-left: -0.4%;">SQL</span>
+        <span style="color:#0080ff; margin-right: 0;">Database</span>
+        <span style="color: orange; margin-left: -0.4%;">Manager</span>
     </h1>
     <h3 class="loggedIn">Welcome <span sec:authentication="name" class="user"></span></h3>
     <h3 class="loggedIn" th:utext="(${connectedDatabase}!=null and ${connectedDatabase}!='' ? '<br>currently connected to ' + ${connectedDatabase} + '.' : '<br>not connected to any database.')"></h3>
@@ -28,10 +28,11 @@
     <p class="error" th:text="${manageUserError}" th:style="(${manageUserError} == '' or ${manageUserError} == null ? 'display:none' : 'display:block')"></p>
 </header>
 <nav>
+    <span th:text="(${uploadMessage} == null ? '' : (${uploadMessage} == '' ? 'Done!' : ${uploadMessage}))"></span>
     <form th:action="@{/uploadCSV}" method="post" enctype="multipart/form-data" id="uploadForm">
         <input type="file" id="file" name="multipartFile">
         <input type="text" id="table_name" name="tableName">
-        <input type="submit" value="Upload" class="button">
+        <input type="submit" value="Upload to database" class="button">
     </form>
     <section class="databaseStructure">
         <div class="subsection" title="Display's the tables from the connected database.">
@@ -73,7 +74,7 @@
         <div class="subsection databaseConnection">
             <form th:action="@{/checkConnection}" method="post">
                 <h4>Connect to database</h4>
-                <img class="deltilogo" alt="delticomlogo" th:src="@{/stylesheet/images/logo.png}">
+                <img class="logo" alt="logo" th:src="@{/stylesheet/images/logo.png}">
                 <p class="userRequirement">
                     Insert the required information in order to connect to the data base. If you do not have the necessary credentials to connect to the desired data base, please contact your supervisor.
                 </p>
@@ -118,8 +119,9 @@
     </section>
     <form th:action="@{/customScript}" method="post" enctype="multipart/form-data" id="runScript">
         <input type="file" id="scriptFile" name="multipartFile">
-        <input type="submit" value="Upload" class="button">
+        <input type="submit" value="Run Script" class="button">
     </form>
+    <span th:text="(${customScriptMessage} == null ? '' : (${customScriptMessage} == '' ? 'Done!' : ${customScriptMessage}))"></span>
 </nav>
 <div id="logs" class="dialog">
     <div class="dialog-content">

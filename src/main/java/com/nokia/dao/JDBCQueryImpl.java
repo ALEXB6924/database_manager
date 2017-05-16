@@ -9,6 +9,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nokia.configuration.constants.ApplicationConstants.DATABASE_DRIVER;
+
 /**
  * Created by alexandru_bobernac on 5/11/17.
  */
@@ -29,7 +31,7 @@ public class JDBCQueryImpl implements JDBCQueryDao {
         int rows = 0;
         String[] queries;
         String message = null;
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName(DATABASE_DRIVER);
         System.out.println(query);
 
         try {
@@ -102,7 +104,7 @@ public class JDBCQueryImpl implements JDBCQueryDao {
         List<List<String>> values = new ArrayList<>();
         int rows = -3;
         String message = "Connection successful!";
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName(DATABASE_DRIVER);
 
         try {
             connection = DriverManager.getConnection("jdbc:mysql://" + hostname + "/" + database, username, password);
@@ -133,8 +135,8 @@ public class JDBCQueryImpl implements JDBCQueryDao {
         String[] queries;
         int rows = 0;
         int allRows[];
-        String message = null;
-        Class.forName("com.mysql.jdbc.Driver");
+        String message = "";
+        Class.forName(DATABASE_DRIVER);
         System.out.println(query);
 
         try {
@@ -144,7 +146,7 @@ public class JDBCQueryImpl implements JDBCQueryDao {
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
 
-            queries = query.split("\n");
+            queries = query.split("(?<=;)");
 
             for (String string : queries) {
                 statement.addBatch(string);
@@ -177,7 +179,7 @@ public class JDBCQueryImpl implements JDBCQueryDao {
         List<List<String>> values = new ArrayList<>();
         int rows = 0;
         String message = "";
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName(DATABASE_DRIVER);
         System.out.println(query);
 
         try {

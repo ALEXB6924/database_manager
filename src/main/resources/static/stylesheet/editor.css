@@ -437,7 +437,7 @@ ul{
 /*--------------------------------------------------------------------*/
 
 
-.deltilogo{
+.logo{
     max-width: 270px;
     max-height: 200px;
     margin: 0 5%;
@@ -446,7 +446,7 @@ ul{
 
 @MEDIA (max-width: 1900px) {
 
-    .deltilogo{
+    .logo{
         max-width: 240px;
         max-height: 150px;
     }
@@ -459,7 +459,7 @@ ul{
 
 @MEDIA (max-width: 1700px) {
 
-    .deltilogo{
+    .logo{
         max-width: 190px;
         max-height: 150px;
     }
@@ -472,7 +472,7 @@ ul{
 
 @MEDIA (max-width: 1400px) {
 
-    .deltilogo{
+    .logo{
         max-width: 150px;
         max-height: 110px;
     }
@@ -485,7 +485,7 @@ ul{
 
 @MEDIA (max-width: 1200px) {
 
-    .deltilogo{
+    .logo{
         max-width: 110px;
         max-height: 90px;
     }
@@ -498,7 +498,7 @@ ul{
 
 @MEDIA (max-width: 1000px) {
 
-    .deltilogo{
+    .logo{
         max-width: 80px;
         max-height: 60px;
     }
@@ -511,7 +511,7 @@ ul{
 
 @MEDIA (max-width: 740px) {
 
-    .deltilogo{
+    .logo{
         max-width: 70px;
         max-height: 40px;
     }
@@ -525,7 +525,7 @@ ul{
 
 @MEDIA (max-width: 700px) {
 
-    .deltilogo{
+    .logo{
         max-width: 40px;
         max-height: 30px;
     }
@@ -591,4 +591,7 @@ ul{
 
 .user{
     color: green;
+}
+#dumpDatabase{
+    width: 40%
 }

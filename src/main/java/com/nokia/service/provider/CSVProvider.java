@@ -11,9 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.net.URLConnection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+
+import static com.nokia.configuration.constants.ApplicationConstants.ROOT_FILE_PATH;
 
 /**
  * Created by alexandru_bobernac on 5/16/17.
@@ -36,9 +36,18 @@ public class CSVProvider {
         String line;
         String prefix;
         StringBuilder stringBuilder = new StringBuilder();
-        PrintWriter printWriter = new PrintWriter("/home/alexandru_bobernac/Documents/" + fileName + ".csv");
+        PrintWriter printWriter = new PrintWriter(ROOT_FILE_PATH + fileName + ".csv");
         while ((line = csvReader.readLine()) != null){
             csvLines.add(line.replaceAll("[^A-Za-z0-9, ]", "").split(","));
+        }
+
+        Iterator it = csvLines.iterator();
+        while(it.hasNext()) {
+            String[] value= (String[]) it.next();
+
+            if (value == null || value.length == 0 || value[0].equals("")) {
+                it.remove();
+            }
         }
 
         for (int i = 1; i < csvLines.size(); i++){
@@ -53,7 +62,7 @@ public class CSVProvider {
         printWriter.write(stringBuilder.toString());
         printWriter.close();
 
-        String script = "LOAD DATA LOCAL INFILE '/home/alexandru_bobernac/Documents/" + fileName + ".csv' " +
+        String script = "LOAD DATA LOCAL INFILE '" + ROOT_FILE_PATH + fileName + ".csv' " +
                 "INTO TABLE " + tableName + " " +
                 "FIELDS TERMINATED BY ',' " +
                 "ENCLOSED BY '\"' " +
@@ -71,7 +80,7 @@ public class CSVProvider {
     public File tableToCSV(int fileName) throws FileNotFoundException {
 
         StringBuilder stringBuilder = new StringBuilder();
-        PrintWriter printWriter = new PrintWriter("/home/alexandru_bobernac/Documents/" + fileName + ".csv");
+        PrintWriter printWriter = new PrintWriter(ROOT_FILE_PATH + fileName + ".csv");
         String prefix = "";
         for (String column : csvDataHolder.getColumns()){
             stringBuilder.append(prefix);
@@ -92,7 +101,7 @@ public class CSVProvider {
         printWriter.write(stringBuilder.toString());
         printWriter.close();
 
-        File fileToDownload = new File("/home/alexandru_bobernac/Documents/" + fileName + ".csv");
+        File fileToDownload = new File(ROOT_FILE_PATH + fileName + ".csv");
 
         return fileToDownload;
     }

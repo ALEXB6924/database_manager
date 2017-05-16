@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.nokia.configuration.constants.ApplicationConstants.ROOT_FILE_PATH;
+
 /**
  * Created by alexandru_bobernac on 5/11/17.
  */
@@ -158,6 +160,7 @@ public class DatabaseManagementController {
             throws SQLException, ClassNotFoundException, IOException {
 
         frontendDataHolder.setJdbcQuery(managerUtil.runCustomScript(multipartFile));
+        redirectAttributes.addFlashAttribute("customScriptMessage", frontendDataHolder.getJdbcQuery().getMessage());
 
         return "redirect:/sqlTransaction";
     }
@@ -165,19 +168,25 @@ public class DatabaseManagementController {
     @RequestMapping(value = "/dumpDatabase",  method = RequestMethod.POST)
     public String dumpDatabase(HttpServletResponse httpServletResponse) throws IOException, InterruptedException {
 
-        File fileToDownload = managerUtil.dumpDatabaseTofile();
+        String executeCmd = "mysqldump -u " + frontendDataHolder.getDbusername() + " -p" + frontendDataHolder.getDbpassword() +
+                " " + frontendDataHolder.getConnectedDatabase() + " -r " + ROOT_FILE_PATH + "dump.txt";
+        Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+        int processComplete = runtimeProcess.waitFor();
+        if (processComplete == 0) {
+            File fileToDownload = new File(ROOT_FILE_PATH + "dump.txt");
 
-        String mimeType = URLConnection.guessContentTypeFromName(fileToDownload.getName());
-        if (mimeType == null) {
-            mimeType = "application/octet-stream";
+            String mimeType = URLConnection.guessContentTypeFromName(fileToDownload.getName());
+            if (mimeType == null) {
+                mimeType = "application/octet-stream";
+            }
+
+            httpServletResponse.setContentType(mimeType);
+            httpServletResponse.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", "dump.txt"));
+            httpServletResponse.setContentLength((int) fileToDownload.length());
+
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(fileToDownload));
+            FileCopyUtils.copy(inputStream, httpServletResponse.getOutputStream());
         }
-
-        httpServletResponse.setContentType(mimeType);
-        httpServletResponse.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", "dump.txt"));
-        httpServletResponse.setContentLength((int) fileToDownload.length());
-
-        InputStream inputStream = new BufferedInputStream(new FileInputStream(fileToDownload));
-        FileCopyUtils.copy(inputStream, httpServletResponse.getOutputStream());
 
         return "redirect:/sqlTransaction";
     }

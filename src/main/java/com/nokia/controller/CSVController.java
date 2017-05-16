@@ -41,6 +41,7 @@ public class CSVController {
     public String uploadCSVTable(@RequestParam MultipartFile multipartFile, @RequestParam String tableName, RedirectAttributes redirectAttributes) throws IOException, SQLException, ClassNotFoundException {
 
         frontendDataHolder.setJdbcQuery(csvProvider.uploadToDatabase(multipartFile, tableName));
+        redirectAttributes.addFlashAttribute("uploadMessage", frontendDataHolder.getJdbcQuery().getMessage());
 
         return "redirect:/sqlTransaction";
     }

@@ -11,8 +11,8 @@ import java.util.List;
 @Component
 public class CSVDataHolder {
 
-    List<String> columns;
-    List<List<String>> values;
+    private List<String> columns;
+    private List<List<String>> values;
 
     public CSVDataHolder() {
     }

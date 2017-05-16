@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.nokia.configuration.constants.ApplicationConstants.DATABASE_DRIVER;
+import static com.nokia.configuration.constants.ApplicationConstants.ROOT_FILE_PATH;
+
 /**
  * Created by alexandru_bobernac on 5/12/17.
  */
@@ -72,7 +75,7 @@ public class ManagerUtil {
     public Map<String, List<Map<String, Object>>> getDatabaseTables(Map<String, List<Map<String, Object>>> json, List<Map<String, Object>> list,
                                                              Map<String, Object> columnMap) throws SQLException, ClassNotFoundException {
 
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName(DATABASE_DRIVER);
         Connection con = DriverManager.getConnection(
                 "jdbc:mysql://" + frontendDataHolder.getHostname() + "/" + frontendDataHolder.getConnectedDatabase() +
                         "?zeroDateTimeBehavior=convertToNull", frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword());
@@ -102,7 +105,7 @@ public class ManagerUtil {
         Map<String, List<Map<String, Object>>> json = new HashMap<>();
         List<Map<String, Object>> list = new ArrayList<>();
 
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName(DATABASE_DRIVER);
         Connection connection = DriverManager.getConnection("jdbc:mysql://" + frontendDataHolder.getHostname() + "/" + frontendDataHolder.getConnectedDatabase(),
                 frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword());
         PreparedStatement ps = connection.prepareStatement(
@@ -125,18 +128,6 @@ public class ManagerUtil {
         json.put("databaseStructure", list);
 
         return json;
-    }
-
-    public File dumpDatabaseTofile() throws InterruptedException, IOException {
-
-        String executeCmd = "mysqldump -u" + frontendDataHolder.getDbusername() + " -p" + frontendDataHolder.getDbpassword() +
-                " --database " + frontendDataHolder.getConnectedDatabase() + " -r " + "/home/alexandru_bobernac/Documents/dump.txt";
-        Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
-        int processComplete = runtimeProcess.waitFor();
-        if (processComplete == 0) {
-            return new File("/home/alexandru_bobernac/Documents/dump.txt");
-        }
-        return new File("");
     }
 
     public JDBCQuery runCustomScript(MultipartFile multipartFile) throws IOException, SQLException, ClassNotFoundException {
