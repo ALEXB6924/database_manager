@@ -2,12 +2,16 @@ package com.nokia.controller.helper;
 
 import com.nokia.model.JDBCQuery;
 import com.nokia.model.User;
+import com.nokia.service.JDBCQueryService;
 import com.nokia.service.LogService;
 import com.nokia.controller.helper.beans.FrontendDataHolder;
+import org.json.simple.JSONValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +26,10 @@ public class ManagerUtil {
 
     @Autowired
     private LogService logService;
-
     @Autowired
     private FrontendDataHolder frontendDataHolder;
+    @Autowired
+    private JDBCQueryService jdbcQueryService;
 
     public Map<String, List<List<String>>> getJSONQueryResults(@RequestParam String statement, User user, JDBCQuery jdbcQuery) {
         List<String> columnHeader;
@@ -121,4 +126,38 @@ public class ManagerUtil {
 
         return json;
     }
+
+    public File dumpDatabaseTofile() throws InterruptedException, IOException {
+
+        String executeCmd = "mysqldump -u" + frontendDataHolder.getDbusername() + " -p" + frontendDataHolder.getDbpassword() +
+                " --database " + frontendDataHolder.getConnectedDatabase() + " -r " + "/home/alexandru_bobernac/Documents/dump.txt";
+        Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
+        int processComplete = runtimeProcess.waitFor();
+        if (processComplete == 0) {
+            return new File("/home/alexandru_bobernac/Documents/dump.txt");
+        }
+        return new File("");
+    }
+
+    public JDBCQuery runCustomScript(MultipartFile multipartFile) throws IOException, SQLException, ClassNotFoundException {
+
+        InputStream inputStream = multipartFile.getInputStream();
+        BufferedReader sqlScript = new BufferedReader(new InputStreamReader(inputStream));
+        List<String[]> lines = new ArrayList<>();
+        String line;
+        String script = "";
+        while ((line = sqlScript.readLine()) != null){
+//            csvLines.add(line.replaceAll("[^A-Za-z0-9, ]", "").split(","));
+//            lines.add(line.split("\n"));
+            script = script + line + "\n";
+        }
+
+        JDBCQuery jdbcQuery = jdbcQueryService.runCustomScript(script, frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword(),
+                frontendDataHolder.getConnectedDatabase(), frontendDataHolder.getHostname());
+        if (frontendDataHolder.getConnectedDatabase() == null || frontendDataHolder.getConnectedDatabase().isEmpty()){
+            jdbcQuery.setMessage("Could not establish connection!");
+        }
+        return jdbcQuery;
+    }
 }
+

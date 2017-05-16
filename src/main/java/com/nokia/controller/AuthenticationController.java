@@ -26,26 +26,7 @@ import java.security.NoSuchAlgorithmException;
 public class AuthenticationController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JDBCQueryService jdbcQueryService;
-
-    @Autowired
-    private LogService logService;
-
-    @Autowired
-    private DatabaseURLService databaseURLService;
-
-    @Autowired
     private HttpServletRequest httpServletRequest;
-
-    @Autowired
-    private HttpServletResponse httpServletResponse;
-
-    @Autowired
-    private HttpSession httpSession;
-
     @Autowired
     private FrontendDataHolder frontendDataHolder;
 
@@ -57,6 +38,7 @@ public class AuthenticationController {
         frontendDataHolder.setDbusername("");
         frontendDataHolder.setConnectedDatabase("");
         frontendDataHolder.setQuery("");
+        frontendDataHolder.setJdbcQuery(new JDBCQuery());
 
         Object flash = httpServletRequest.getSession().getAttribute("flash");
 
@@ -86,11 +68,9 @@ public class AuthenticationController {
         frontendDataHolder.setQuery("");
         frontendDataHolder.setAvailableDatabases();
 
-        if(!modelMap.containsAttribute("sqlStatement")) {
-            modelMap.put("statement", frontendDataHolder.getQuery());
-            modelMap.put("databases", frontendDataHolder.getAvailableDatabases());
-            modelMap.put("sqlStatement", new JDBCQuery());
-        }
+        modelMap.put("sqlStatement", frontendDataHolder.getJdbcQuery());
+        modelMap.put("statement", frontendDataHolder.getQuery());
+        modelMap.put("databases", frontendDataHolder.getAvailableDatabases());
         modelMap.put("connectedDatabase", frontendDataHolder.getConnectedDatabase());
 
         return "editor";

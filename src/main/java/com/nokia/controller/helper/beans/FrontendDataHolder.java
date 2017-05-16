@@ -1,6 +1,7 @@
 package com.nokia.controller.helper.beans;
 
 import com.nokia.model.DatabaseURL;
+import com.nokia.model.JDBCQuery;
 import com.nokia.service.DatabaseURLService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,15 @@ public class FrontendDataHolder {
     String hostname;
     String dbusername;
     String dbpassword;
+    JDBCQuery jdbcQuery;
+
+    public JDBCQuery getJdbcQuery() {
+        return jdbcQuery;
+    }
+
+    public void setJdbcQuery(JDBCQuery jdbcQuery) {
+        this.jdbcQuery = jdbcQuery;
+    }
 
     public FrontendDataHolder() {
     }

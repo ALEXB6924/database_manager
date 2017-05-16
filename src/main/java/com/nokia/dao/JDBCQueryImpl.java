@@ -168,4 +168,37 @@ public class JDBCQueryImpl implements JDBCQueryDao {
         return new JDBCQuery(rows, message, columns, values);
     }
 
+    @Override
+    public JDBCQuery runCSVUploadQuery(String query, String username, String password, String database, String hostname) throws SQLException, ClassNotFoundException {
+
+        Connection connection = null;
+        List<String> columns = new ArrayList<>();
+        Statement statement;
+        List<List<String>> values = new ArrayList<>();
+        int rows = 0;
+        String message = "";
+        Class.forName("com.mysql.jdbc.Driver");
+        System.out.println(query);
+
+        try {
+            connection = DriverManager.getConnection(
+                    "jdbc:mysql://" + hostname + "/" + database + "?zeroDateTimeBehavior=convertToNull", username,
+                    password);
+            connection.setAutoCommit(false);
+            statement = connection.createStatement();
+            rows = statement.executeUpdate(query);
+
+        } catch (SQLException e) {
+            message = e.getMessage();
+            rows = -1;
+        } finally {
+            if (connection != null) {
+                connection.commit();
+                connection.close();
+            }
+        }
+
+        return new JDBCQuery(rows, message, columns, values);
+    }
+
 }

@@ -14,4 +14,6 @@ public interface JDBCQueryService {
             throws ClassNotFoundException, SQLException;
     JDBCQuery runCustomScript(String query, String username, String password, String database, String hostname)
             throws SQLException, ClassNotFoundException;
+    JDBCQuery runCSVUploadQuery(String query, String username, String password, String database, String hostname)
+            throws SQLException, ClassNotFoundException;
 }

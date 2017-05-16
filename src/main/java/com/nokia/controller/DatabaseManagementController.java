@@ -52,8 +52,6 @@ public class DatabaseManagementController {
     private FrontendDataHolder frontendDataHolder;
     @Autowired
     private ManagerUtil managerUtil;
-    @Autowired
-    private CSVDataHolder csvDataHolder;
 
     @RequestMapping(value = "/executeStatement", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -80,29 +78,17 @@ public class DatabaseManagementController {
                                   RedirectAttributes redirectAttributes) throws SQLException, ClassNotFoundException {
 
         JDBCQuery jdbcQuery;
-//        if(!database.equals("junit")) {
-            frontendDataHolder.setHostname(databaseURLService.getDatabaseUrl(database));
-//        }
-
-//        else {
-//            frontendDataHolder.setHostname(httpServletRequest.getRemoteAddr() + ":3306");
-//        }
+        frontendDataHolder.setHostname(databaseURLService.getDatabaseUrl(database));
         jdbcQuery = jdbcQueryService.getConnection(username, password, database, frontendDataHolder.getHostname());
         if (jdbcQuery.getMessage().equals("Connection successful!")) {
             frontendDataHolder.setDbusername(username);
             frontendDataHolder.setDbpassword(password);
             frontendDataHolder.setConnectedDatabase(database);
             frontendDataHolder.setDbusername(password);
+            frontendDataHolder.markSelectedDatabse();
         }
-        // }
-        frontendDataHolder.markSelectedDatabse();
 
-        redirectAttributes.addFlashAttribute("statement", frontendDataHolder.getQuery());
-        redirectAttributes.addFlashAttribute("databases", frontendDataHolder.getAvailableDatabases());
-        redirectAttributes.addFlashAttribute("sqlStatement", jdbcQuery);
-
-        System.out.println(jdbcQuery.getMessage());
-        System.out.println(jdbcQuery.getRows());
+        frontendDataHolder.setJdbcQuery(jdbcQuery);
 
         return "redirect:/sqlTransaction";
 
@@ -127,9 +113,7 @@ public class DatabaseManagementController {
             jdbcQuery.setMessage("No connection!");
         }
 
-        redirectAttributes.addFlashAttribute("statement", frontendDataHolder.getQuery());
-        redirectAttributes.addFlashAttribute("databases", frontendDataHolder.getAvailableDatabases());
-        redirectAttributes.addFlashAttribute("sqlStatement", jdbcQuery);
+        frontendDataHolder.setJdbcQuery(jdbcQuery);
 
         return "redirect:/sqlTransaction";
     }
@@ -170,51 +154,30 @@ public class DatabaseManagementController {
     }
 
     @RequestMapping(value = "/customScript", method = RequestMethod.POST)
-    public String customScript(@RequestParam MultipartFile multipartFile, Principal principal, RedirectAttributes redirectAttributes)
+    public String customScript(@RequestParam MultipartFile multipartFile, RedirectAttributes redirectAttributes)
             throws SQLException, ClassNotFoundException, IOException {
 
-        InputStream inputStream = multipartFile.getInputStream();
-        BufferedReader sqlScript = new BufferedReader(new InputStreamReader(inputStream));
-        List<String[]> lines = new ArrayList<>();
-        String line;
-        String script = "";
-        while ((line = sqlScript.readLine()) != null){
-//            csvLines.add(line.replaceAll("[^A-Za-z0-9, ]", "").split(","));
-//            lines.add(line.split("\n"));
-            script = script + line + "\n";
-        }
-
-        JDBCQuery jdbcQuery = jdbcQueryService.runCustomScript(script, frontendDataHolder.getDbusername(), frontendDataHolder.getDbpassword(),
-                frontendDataHolder.getConnectedDatabase(), frontendDataHolder.getHostname());
-        if (frontendDataHolder.getConnectedDatabase() == null || frontendDataHolder.getConnectedDatabase().isEmpty()){
-            jdbcQuery.setMessage("Could not establish connection!");
-        }
+        frontendDataHolder.setJdbcQuery(managerUtil.runCustomScript(multipartFile));
 
         return "redirect:/sqlTransaction";
     }
 
     @RequestMapping(value = "/dumpDatabase",  method = RequestMethod.POST)
     public String dumpDatabase(HttpServletResponse httpServletResponse) throws IOException, InterruptedException {
-        String executeCmd = "mysqldump -u" + frontendDataHolder.getDbusername() + " -p" + frontendDataHolder.getDbpassword() +
-                " --database " + frontendDataHolder.getConnectedDatabase() + " -r " + "/home/alexandru_bobernac/Documents/dump.txt";
-        Process runtimeProcess = Runtime.getRuntime().exec(executeCmd);
-        int processComplete = runtimeProcess.waitFor();
-        if (processComplete == 0) {
 
-            File fileToDownload = new File("/home/alexandru_bobernac/Documents/dump.txt");
+        File fileToDownload = managerUtil.dumpDatabaseTofile();
 
-            String mimeType = URLConnection.guessContentTypeFromName(fileToDownload.getName());
-            if (mimeType == null) {
-                mimeType = "application/octet-stream";
-            }
-
-            httpServletResponse.setContentType(mimeType);
-            httpServletResponse.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", "dump.txt"));
-            httpServletResponse.setContentLength((int) fileToDownload.length());
-
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(fileToDownload));
-            FileCopyUtils.copy(inputStream, httpServletResponse.getOutputStream());
+        String mimeType = URLConnection.guessContentTypeFromName(fileToDownload.getName());
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
         }
+
+        httpServletResponse.setContentType(mimeType);
+        httpServletResponse.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", "dump.txt"));
+        httpServletResponse.setContentLength((int) fileToDownload.length());
+
+        InputStream inputStream = new BufferedInputStream(new FileInputStream(fileToDownload));
+        FileCopyUtils.copy(inputStream, httpServletResponse.getOutputStream());
 
         return "redirect:/sqlTransaction";
     }

@@ -30,4 +30,10 @@ public class JDBCQueryServiceImpl implements JDBCQueryService {
     public JDBCQuery runCustomScript(String query, String username, String password, String database, String hostname) throws SQLException, ClassNotFoundException {
         return jdbcQueryDao.runCustomScript(query, username, password, database, hostname);
     }
+
+    @Override
+    public JDBCQuery runCSVUploadQuery(String query, String username, String password, String database, String hostname)
+            throws SQLException, ClassNotFoundException {
+        return jdbcQueryDao.runCSVUploadQuery(query, username, password, database, hostname);
+    }
 }
