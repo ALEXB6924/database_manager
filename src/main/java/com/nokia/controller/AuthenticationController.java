@@ -55,9 +55,9 @@ public class AuthenticationController {
 //		userService.saveUser("user", "user", "user");
 //        databaseURLService.saveDatabaseConnection("junit", "localhost:3306");
 //
-//		logService.saveLog("admin",	"dwms",	"twms",	"update StockUnit s set s.amount = 90",	"2016-08-31 10:25:54");
+//		logService.saveLog("admin",	"dwms",	"twms",	"update StockUnit s set s.amount = 90",	"2017-04-31 10:25:54");
 //		logService.saveLog("admin",	"dwms",	"twms",	"INSERT INTO sublager VALUES ('test', 55 )", "2016-08-31 10:34:41");
-//		logService.saveLog("admin",	"dwms",	"twms",	"update StockUnit set availableAmount = amount", "2016-09-02 12:06:08");
+//		logService.saveLog("admin",	"dwms",	"twms",	"update StockUnit set availableAmount = amount", "2013-09-02 12:06:08");
 //		logService.saveLog("admin",	"dwms",	"twms",	"UPDATE unitloadcapaArticle SET capa=90 WHERE articleId='R-PKW9'", "2016-09-13 12:20:25");
 
         return "login";

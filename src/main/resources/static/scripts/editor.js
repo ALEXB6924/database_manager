@@ -86,7 +86,7 @@ $(document).ready(function(){
                             $.getJSON(pathname, {table : selectedTable},  function(data){
                                 $('#databaseTableColumn li').remove();
                                 $.each(data.databaseStructure, function(key, val){
-                                    $('#databaseTableColumn').append('<li>'+val.column+' '+val.column_type+'</li>');
+                                    $('#databaseTableColumn').append('<li>'+val.column+' '+'<span id="column_types">' + val.column_type + '<span>'+'</li>');
                                 });
                             });
                         }
